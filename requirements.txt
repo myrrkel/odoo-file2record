@@ -1,0 +1,4 @@
+PyMuPDF
+pytesseract
+opencv-python
+mammoth
