@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="file2record_config_view_form" model="ir.ui.view">
+        <field name="name">file2record.config.view.form</field>
+        <field name="model">file2record.config</field>
+        <field name="arch" type="xml">
+            <form string="File2Record Configurations">
+                <sheet>
+                    <group name="top">
+                        <group>
+                            <field name="name"/>
+                            <field name="description"/>
+                            <field name="model_id"/>
+                            <field name="show_upload_file_button"/>
+                            <field name="data_type"/>
+                            <field name="record_creation_method"/>
+                            <field name="model_record_creation_method"
+                                   attrs="{'invisible': [('record_creation_method', '!=', 'method')]}"/>
+                        </group>
+                        <field name="code" widget="ace" options="{'mode': 'python'}"
+                               placeholder="Enter Python code here."
+                               attrs="{'invisible': [('record_creation_method', '!=', 'code')]}"/>
+                    </group>
+
+                    <group name="bottom">
+                        <group>
+                            <field name="post_process"/>
+                            <field name="model_post_process_method"
+                               attrs="{'invisible': [('post_process', '!=', 'method')]}"/>
+                        </group>
+                        <field name="post_process_code" widget="ace" options="{'mode': 'python'}"
+                               placeholder="Enter Python code here."
+                               attrs="{'invisible': [('post_process', '!=', 'code')]}"/>
+
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="file2record_config_view_tree" model="ir.ui.view">
+        <field name="name">file2record.config.view.tree</field>
+        <field name="model">file2record.config</field>
+        <field name="arch" type="xml">
+            <tree string="File2Record Configurations">
+                <field name="name"/>
+                <field name="description"/>
+                <field name="model_id"/>
+                <field name="data_type"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="file2record_config_action" model="ir.actions.act_window">
+        <field name="name">File2Record Configurations</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">file2record.config</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No File2Record Configuration
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_file2record" name="File2Record" parent="base.menu_custom" sequence="25"/>
+    <menuitem id="menu_file2record_config" name="File2Record Configurations"
+              action="file2record_config_action"
+              sequence="2"
+              parent="file2record.menu_file2record"/>
+</odoo>

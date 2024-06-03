@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="file2record_config_view_form_inherit_camera" model="ir.ui.view">
+        <field name="name">file2record.config.view.form.inherit.camera</field>
+        <field name="model">file2record.config</field>
+        <field name="inherit_id" ref="file2record.file2record_config_view_form"/>
+        <field name="arch" type="xml">
+            <field name="show_upload_file_button" position="after">
+                <field name="show_upload_camera_button"/>
+            </field>
+        </field>
+    </record>
+</odoo>

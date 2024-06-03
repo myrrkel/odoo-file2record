@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+
+    <t t-inherit="web.ListView.Buttons" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[hasclass('o_list_buttons')]" position="inside">
+            <t t-call="file2record_text.TextControllerButton"/>
+        </xpath>
+    </t>
+
+    <t t-inherit="web.KanbanView.Buttons" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[hasclass('file2record-btn-group')]" position="inside">
+            <t t-call="file2record_text.TextControllerButton"/>
+        </xpath>
+    </t>
+
+</templates>

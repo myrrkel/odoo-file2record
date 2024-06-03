@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="file2record_config_view_form_inherit" model="ir.ui.view">
+        <field name="name">file2record.config.view.form.inherit</field>
+        <field name="model">file2record.config</field>
+        <field name="inherit_id" ref="file2record.file2record_config_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='record_creation_method']" position="after">
+                <field name="ai_completion_id"
+                       attrs="{'invisible': [('record_creation_method', '!=', 'ai')]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

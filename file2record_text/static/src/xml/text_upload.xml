@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<template>
+
+    <t t-name="file2record_text.TextControllerButton" owl="1">
+        <TextFieldController t-props="props">
+            <button/>
+        </TextFieldController>
+    </t>
+
+    <t t-name="file2record_text.TextFieldController" owl="1">
+        <button type="button" class="btn btn-secondary d-none btn-text2record"
+                data-tooltip="Send a text or url to create a new record"
+                t-on-click="_openTextController">
+            <i class="fa fa-file-text"/>
+        </button>
+    </t>
+
+    <t t-name="file2record_text.TextUpload" owl="1">
+        <Dialog title="'Create a record from text'" size="'lg'">
+
+            <div class="text-center">
+                <textarea id="text"></textarea>
+            </div>
+            <t t-set-slot="footer">
+                <button class="btn btn-primary" id="click-photo" t-on-click="sendText">Create a record</button>
+                <button class="btn btn-primary" t-on-click.stop="props.close">Close</button>
+            </t>
+        </Dialog>
+
+    </t>
+</template>

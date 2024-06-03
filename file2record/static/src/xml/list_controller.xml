@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="file2record.ViewUploadRecordButton" owl="1">
+        <RecordFileUploader>
+            <t t-set-slot="default">
+                <button t-ref="file2recordButton" type="button" class="btn btn-secondary d-none btn-file2record"
+                        data-tooltip="Upload file to create a new record">
+                    <i class="fa fa-upload"/>
+                </button>
+            </t>
+        </RecordFileUploader>
+    </t>
+    <t t-inherit="web.ListView.Buttons" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[hasclass('o_list_buttons')]" position="inside">
+            <t t-call="file2record.ViewUploadRecordButton"/>
+        </xpath>
+    </t>
+
+    <t t-inherit="web.KanbanView.Buttons" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[hasclass('o_cp_buttons')]" position="inside">
+            <div class="file2record-btn-group">
+                <t t-call="file2record.ViewUploadRecordButton"/>
+            </div>
+        </xpath>
+    </t>
+
+    <t t-name="file2record.RecordFileUploader" owl="1">
+        <FileUploader
+            acceptedFileExtensions="props.acceptedFileExtensions"
+            fileUploadClass="'record_file_uploader'"
+            multiUpload="true"
+            onUploaded.bind="onFileUploaded"
+            onUploadComplete.bind="onUploadComplete">
+            <t t-set-slot="toggler">
+                <t t-if="props.togglerTemplate" t-call="{{ props.togglerTemplate }}"/>
+                <t t-else="" t-slot="default"/>
+            </t>
+            <t t-slot="extra"/>
+        </FileUploader>
+    </t>
+</templates>

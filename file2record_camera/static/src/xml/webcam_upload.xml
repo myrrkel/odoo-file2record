@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<template>
+
+    <t t-name="file2record_camera.WebcamButton" owl="1">
+        <WebcamImageField t-props="props">
+            <t t-set-slot="default">
+                <button/>
+            </t>
+        </WebcamImageField>
+    </t>
+
+    <t t-name="file2record_camera.WebcamImageField" owl="1">
+        <button type="button" class="btn btn-secondary d-none btn-camera2record"
+                data-tooltip="Take a picture to create a new record"
+                t-on-click="_openWebcam">
+            <i class="fa fa-camera"/>
+        </button>
+    </t>
+
+    <t t-name="file2record_camera.WebcamUpload" owl="1">
+        <Dialog title="'Take a picture'" size="'lg'">
+
+            <div class="text-center">
+                <video id="video" width="640" height="480" autoplay="1"></video>
+                <div id="dataurl-container" class="d-none">
+                    <canvas id="canvas" width="640" height="480"></canvas>
+                    <textarea id="dataurl" readonly="1"></textarea>
+                    <input id="model_id" readonly="1"></input>
+                </div>
+            </div>
+            <t t-set-slot="footer">
+                <button class="btn btn-primary" id="click-photo" t-on-click="takePicture">Take a picture</button>
+                <button class="btn btn-primary" t-on-click.stop="props.close">Close</button>
+            </t>
+        </Dialog>
+
+    </t>
+</template>
