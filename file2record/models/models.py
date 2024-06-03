@@ -209,7 +209,7 @@ class BaseModel(models.AbstractModel):
 
     def _get_default_record_creation_prompt(self, content):
         json_dict = self._get_json_model_fields_description()
-        instructions = '''You are an API that fill the json dictionary provided
+        instructions = '''You are an API that fills the json dictionary provided
 with values found in the document.
 Don't do assertions.
 If you don't find a value in the document, set the value at false.
