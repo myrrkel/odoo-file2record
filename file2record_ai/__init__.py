@@ -2,3 +2,4 @@
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/algpl.html).
 
 from . import models
+from . import wizards

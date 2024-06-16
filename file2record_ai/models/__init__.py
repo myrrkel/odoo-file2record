@@ -3,3 +3,4 @@
 
 from . import models
 from . import file2record_config
+from . import ai_completion_result

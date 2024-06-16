@@ -224,14 +224,14 @@ If there is no relevant information in the document return an empty dictionary.'
                        ('DOCUMENT', content)]
         return '\n\n'.join('# %s :\n\n%s' % (key, value) for key, value in prompt_list)
 
-    def _model_description_excluded_fields(self):
+    def model_description_excluded_fields(self):
         return ['id', 'access_token', 'password', 'create_date', 'write_date']
 
     def _get_model_fields(self):
         field_types = ['html', 'text', 'char', 'boolean', 'integer', 'float', 'many2one', 'one2many']
 
         def is_valid_field(field):
-            if field.name in self._model_description_excluded_fields():
+            if field.name in self.model_description_excluded_fields():
                 return False
             if not field.store:
                 return False

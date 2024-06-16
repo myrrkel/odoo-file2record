@@ -39,3 +39,10 @@ class BaseModel(models.AbstractModel):
     def _get_values_from_attachment_id(self, attachment_id):
         context = {'model': 'ir.attachment', 'res_id': attachment_id}
         return super(BaseModel, self.with_context(completion=context))._get_values_from_attachment_id(attachment_id)
+
+    def field_value_to_ai_answer_value(self, field_name):
+        field = self._fields[field_name]
+        if field.type == 'boolean':
+            return 'true' if self[field_name] else 'false'
+        else:
+            return self[field_name]

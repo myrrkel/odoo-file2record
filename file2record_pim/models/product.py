@@ -17,3 +17,26 @@ class ProductTemplate(models.Model):
             available_options = ', '.join(attribute_id.option_ids.mapped('name'))
             res += f'\n    Available {field.name} values : {available_options}'
         return res
+
+    def field_value_to_ai_answer_value(self, field_name):
+        field = self._fields[field_name]
+        if field.type == 'many2one':
+            if field.comodel_name == 'attribute.option':
+                return {'option_value': self[field_name].name}
+        return super(ProductTemplate, self).field_value_to_ai_answer_value(field_name)
+
+    def model_description_excluded_fields(self):
+        res = super(ProductTemplate, self).model_description_excluded_fields()
+        fields = [
+            'attribute_set_completion_rate',
+            'sequence',
+            'sale_ok',
+            'purchase_ok',
+            'active',
+            'color',
+            'can_image_1024_be_zoomed',
+            'has_configurable_attributes',
+            'sale_line_warn_msg',
+        ]
+        res.extend(fields)
+        return res
