@@ -22,12 +22,16 @@ class BaseModel(models.AbstractModel):
         if not res and content:
             completion_id = self.env.ref('file2record_ai.default_record_creation')
             try:
-                empty_dict = self._get_default_record_creation_prompt(content)
+                prompt = self._get_default_record_creation_prompt(content)
+                res = completion_id.create_completion(prompt=prompt, response_format='json_object')
+                if isinstance(res[0], str):
+                    return json.loads(res[0])
+                else:
+                    return json.loads(res[0].answer)
             except Exception as err:
                 _logger.error(err, exc_info=True)
-            prompt = ('Create a json dictionary as described in this schema: \n %s to create a %s '
-                      'following these data: \n %s') % (empty_dict, self._name, content)
-            res = completion_id.create_completion(prompt=prompt, response_format='json_object')
-            return json.loads(res[0])
-
         return res
+
+    def _get_values_from_attachment_id(self, attachment_id):
+        context = {'model': 'ir.attachment', 'res_id': attachment_id}
+        return super(BaseModel, self.with_context(completion=context))._get_values_from_attachment_id(attachment_id)
