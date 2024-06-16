@@ -11,6 +11,7 @@
             <field name="frequency_penalty">0</field>
             <field name="presence_penalty">0</field>
             <field name="top_p">1</field>
+            <field name="response_format">json_object</field>
         </record>
     </data>
 </odoo>

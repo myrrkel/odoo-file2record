@@ -55,6 +55,7 @@ class BaseModel(models.AbstractModel):
             if record_id:
                 attachment_id.res_id = record_id.id
                 attachment_id.res_model = self._name
+                attachment_id.register_as_main_attachment()
                 return record_id
 
     def _get_values_from_attachment_id(self, attachment_id):
@@ -88,6 +89,9 @@ class BaseModel(models.AbstractModel):
             values = self._get_record_values_from_raw_content(name, content_type, content)
         if config_id and config_id.post_process == 'code':
             values = config_id.eval_post_process_code(values)
+        if config_id and config_id.post_process == 'method':
+            post_process_function = getattr(self, self.post_process)
+            values = post_process_function(values)
 
         if not values:
             values = {'name': name.split('.')[0]}
@@ -268,13 +272,16 @@ If there is no relevant information in the document return an empty dictionary.'
         _logger.info(description)
         return description
 
+    def _get_field_description(self, field):
+        help_text = '%s,%s' % (field.string, field.help) if field.help else field.string
+        return '%s (%s) : %s' % (field.name, field.type, help_text)
+
     def _get_fields_description(self, json_values):
         fields = self._get_model_fields()
         fields = [field for field in fields if field.name in json_values]
 
         def _field_description(field):
-            help_text = '%s,%s' % (field.string, field.help) if field.help else field.string
-            field_description = '%s (%s) : %s' % (field.name, field.type, help_text)
+            field_description = self._get_field_description(field)
             if field.type == 'many2one':
                 many2one_description = self.env[field.comodel_name]._get_fields_description(json_values[field.name])
                 if many2one_description and many2one_description not in descriptions:
@@ -412,7 +419,12 @@ If there is no relevant information in the document return an empty dictionary.'
     def get_file2record_config(self, data_type):
         domain = [('model', '=', self._name),
                   ('data_type', '=', data_type)]
-        return self.env['file2record.config'].search(domain, limit=1)
+        config_id = self.env['file2record.config'].search(domain, limit=1)
+        if not config_id:
+            domain = [('model', '=', self._name),
+                      ('data_type', '=', False)]
+            config_id = self.env['file2record.config'].search(domain, limit=1)
+        return config_id
 
     def get_attachments_without_record(self):
         domain = [('res_model', '=', self._name),

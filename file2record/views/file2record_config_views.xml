@@ -28,11 +28,18 @@
                             <field name="model_post_process_method"
                                attrs="{'invisible': [('post_process', '!=', 'method')]}"/>
                         </group>
-                        <field name="post_process_code" widget="ace" options="{'mode': 'python'}"
-                               placeholder="Enter Python code here."
-                               attrs="{'invisible': [('post_process', '!=', 'code')]}"/>
-
                     </group>
+
+                    <div class="oe_edit_only alert alert-info alert-info-center mt-3" role="alert"
+                         attrs="{'invisible': [('post_process', '!=', 'code')]}">
+                        <b>Available variables in post-process code:</b><br/>
+                        self : Current configuration<br/>
+                        res : Result<br/>
+                        values : Record values
+                    </div>
+                    <field name="post_process_code" widget="ace" options="{'mode': 'python'}"
+                           placeholder="Enter Python code here."
+                           attrs="{'invisible': [('post_process', '!=', 'code')]}"/>
                 </sheet>
             </form>
         </field>

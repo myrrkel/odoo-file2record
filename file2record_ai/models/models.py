@@ -14,23 +14,27 @@ class BaseModel(models.AbstractModel):
         config_id = self.get_file2record_config(content_type)
         if config_id.record_creation_method == 'ai':
             completion_id = config_id.ai_completion_id
-            prompt = '%s \n %s' % (completion_id.get_prompt(), content)
-            res = completion_id.create_completion(prompt=prompt)
-            return json.loads(res[0])
-
-        res = super(BaseModel, self)._get_record_values_from_content(name, content_type, content)
-        if not res and content:
-            completion_id = self.env.ref('file2record_ai.default_record_creation')
-            try:
+            if completion_id.prompt_template_id or completion_id.prompt_template:
+                prompt = '%s \n %s' % (completion_id.get_prompt(), content)
+            else:
                 prompt = self._get_default_record_creation_prompt(content)
-                res = completion_id.create_completion(prompt=prompt, response_format='json_object')
-                if isinstance(res[0], str):
-                    return json.loads(res[0])
-                else:
-                    return json.loads(res[0].answer)
-            except Exception as err:
-                _logger.error(err, exc_info=True)
-        return res
+            res = completion_id.create_completion(prompt=prompt)
+        else:
+            res = super(BaseModel, self)._get_record_values_from_content(name, content_type, content)
+            if res:
+                return res
+            if content:
+                completion_id = self.env.ref('file2record_ai.default_record_creation')
+                try:
+                    prompt = self._get_default_record_creation_prompt(content)
+                    res = completion_id.create_completion(prompt=prompt, response_format='json_object')
+                except Exception as err:
+                    _logger.error(err, exc_info=True)
+        if res and isinstance(res, list) and len(res) >= 1:
+            if isinstance(res[0], str):
+                return json.loads(res[0])
+            else:
+                return json.loads(res[0].answer)
 
     def _get_values_from_attachment_id(self, attachment_id):
         context = {'model': 'ir.attachment', 'res_id': attachment_id}
