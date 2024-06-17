@@ -15,10 +15,13 @@ class AICompletionResult(models.Model):
         if not self.model == 'ir.attachment':
             raise UserError(_("Model %s is not supported") % self.model)
         values = json.loads(self.answer)
-        rec = self.resource_ref
+        attachment_id = self.resource_ref
+        rec = self.env[attachment_id.res_model].browse(attachment_id.res_id)
+        if not rec:
+            return self.answer
         for key in values.keys():
             if key in rec.model_description_excluded_fields():
                 continue
             if hasattr(rec, key):
                 values[key] = rec.field_value_to_ai_answer_value(key)
-        return json.dumps(values)
+        return json.dumps(values, indent=2, ensure_ascii=False)
