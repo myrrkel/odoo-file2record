@@ -162,7 +162,11 @@ class BaseModel(models.AbstractModel):
             page.read_contents()
             img_list = page.get_images()
             for img in img_list:
-                page.delete_image(img[0])
+                try:
+                    page.delete_image(img[0])
+                except Exception as err:
+                    _logger.error(err, exc_info=True)
+                    pass
             html_content += page.get_text('html', clip=None)
         return self._clean_html(html_content)
 
