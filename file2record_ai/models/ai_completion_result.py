@@ -25,3 +25,8 @@ class AICompletionResult(models.Model):
             if hasattr(rec, key):
                 values[key] = rec.field_value_to_ai_answer_value(key)
         return json.dumps(values, indent=2, ensure_ascii=False)
+
+    def get_completion_answer(self, answer_type):
+        if answer_type == 'record_values':
+            return self.get_answer_with_record_values()
+        return super(AICompletionResult, self).get_completion_answer(answer_type)
