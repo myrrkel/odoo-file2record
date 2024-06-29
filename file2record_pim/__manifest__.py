@@ -25,6 +25,7 @@
         'security/ir.model.access.csv',
         'security/security.xml',
         'views/product_views.xml',
+        'data/ai_question_answer_tag_data.xml',
     ],
     'assets': {},
     'auto_install': False,

@@ -14,8 +14,9 @@ class ProductTemplate(models.Model):
         if field.comodel_name == 'attribute.option':
             model_id = self.env['ir.model.fields'].search([('model', '=', self._name), ('name', '=', field.name)])
             attribute_id = self.env['attribute.attribute'].search([('field_id', '=', model_id.id)])
-            available_options = ', '.join(attribute_id.option_ids.mapped('name'))
-            res += f'\n    Available {field.name} values : {available_options}'
+            if attribute_id:
+                available_options = ', '.join(sorted(attribute_id.option_ids.mapped('name')))
+                res += f'\n    Available {field.name} values : {available_options}'
         return res
 
     def field_value_to_ai_answer_value(self, field_name):
@@ -40,3 +41,22 @@ class ProductTemplate(models.Model):
         ]
         res.extend(fields)
         return res
+
+    def action_add_to_ai_training(self):
+        self.ensure_one()
+        domain = [('model', '=', 'ir.attachment'),
+                  ('res_id', '=', self.message_main_attachment_id.id),]
+        completion_result_id = self.env['ai.completion.result'].search(domain, limit=1)
+        if completion_result_id:
+            tag_id = self.env.ref('file2record_pim.validated_product_tag')
+            completion_result_id.create_question_answer('record_values', tag_id)
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'message': _('Values added to AI training data set!'),
+                'title': _('Success!'),
+                'type': 'success',
+            }
+        }

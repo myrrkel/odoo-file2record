@@ -9,4 +9,13 @@
             </xpath>
         </field>
     </record>
+
+    <record id="add_to_ai_training_action" model="ir.actions.server">
+        <field name="name">Add to AI training</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="binding_model_id" ref="product.model_product_template"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">action = records.action_add_to_ai_training()</field>
+    </record>
 </odoo>
