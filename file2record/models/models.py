@@ -342,7 +342,7 @@ If there is no relevant information in the document return an empty dictionary.'
                 rec_id = False
                 if values[key]:
                     model = self._fields[key].comodel_name
-                    rec_id = self.env[model]._find_or_create_many2one_record(values[key])
+                    rec_id = self.env[model].with_context(field_name=key)._find_or_create_many2one_record(values[key])
                 if rec_id:
                     values[key] = rec_id
                 else:
@@ -350,7 +350,8 @@ If there is no relevant information in the document return an empty dictionary.'
             if self._fields[key].type == 'one2many':
                 if values[key]:
                     model = self._fields[key].comodel_name
-                    one2many_values_list = self.env[model]._create_one2many_record(values[key])
+                    one2many_values_list = self.env[model].with_context(field_name=key)._create_one2many_record(
+                        values[key])
                     if one2many_values_list:
                         one2many_values_list = [self.env[model].cleanup_record_values(v) for v in one2many_values_list]
                     if one2many_values_list:

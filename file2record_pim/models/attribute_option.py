@@ -16,5 +16,7 @@ class AttributeOption(models.Model):
     def _find_or_create_many2one_domain(self, values):
         domain = []
         if values.get('option_value'):
-            domain.append(('name', 'ilike', values['option_value']))
+            domain.append(('name', '=', values['option_value']))
+        if self.env.context.get('field_name'):
+            domain.append(('attribute_id.name', '=', self.env.context.get('field_name')))
         return domain

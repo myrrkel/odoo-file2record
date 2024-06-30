@@ -43,13 +43,13 @@ class ProductTemplate(models.Model):
         return res
 
     def action_add_to_ai_training(self):
-        self.ensure_one()
-        domain = [('model', '=', 'ir.attachment'),
-                  ('res_id', '=', self.message_main_attachment_id.id),]
-        completion_result_id = self.env['ai.completion.result'].search(domain, limit=1)
-        if completion_result_id:
-            tag_id = self.env.ref('file2record_pim.validated_product_tag')
-            completion_result_id.create_question_answer('record_values', tag_id)
+        for rec in self:
+            domain = [('model', '=', 'ir.attachment'),
+                      ('res_id', '=', rec.message_main_attachment_id.id),]
+            completion_result_id = self.env['ai.completion.result'].search(domain, limit=1)
+            if completion_result_id:
+                tag_id = self.env.ref('file2record_pim.validated_product_tag')
+                completion_result_id.create_question_answer('record_values', tag_id)
 
         return {
             'type': 'ir.actions.client',
