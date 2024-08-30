@@ -15,23 +15,23 @@
                             <field name="data_type"/>
                             <field name="record_creation_method"/>
                             <field name="model_record_creation_method"
-                                   attrs="{'invisible': [('record_creation_method', '!=', 'method')]}"/>
+                                   invisible="record_creation_method != 'method'"/>
                         </group>
                         <field name="code" widget="ace" options="{'mode': 'python'}"
                                placeholder="Enter Python code here."
-                               attrs="{'invisible': [('record_creation_method', '!=', 'code')]}"/>
+                               invisible="record_creation_method != 'code'"/>
                     </group>
 
                     <group name="bottom">
                         <group>
                             <field name="post_process"/>
                             <field name="model_post_process_method"
-                               attrs="{'invisible': [('post_process', '!=', 'method')]}"/>
+                               invisible="post_process != 'method'"/>
                         </group>
                     </group>
 
                     <div class="oe_edit_only alert alert-info alert-info-center mt-3" role="alert"
-                         attrs="{'invisible': [('post_process', '!=', 'code')]}">
+                         invisible="post_process != 'code'">
                         <b>Available variables in post-process code:</b><br/>
                         self : Current configuration<br/>
                         res : Result<br/>
@@ -39,7 +39,7 @@
                     </div>
                     <field name="post_process_code" widget="ace" options="{'mode': 'python'}"
                            placeholder="Enter Python code here."
-                           attrs="{'invisible': [('post_process', '!=', 'code')]}"/>
+                           invisible="post_process != 'code'"/>
                 </sheet>
             </form>
         </field>

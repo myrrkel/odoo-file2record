@@ -2,7 +2,7 @@
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/algpl.html).
 {
     'name': 'Upload Record Camera',
-    'version': '16.1.0.0',
+    'version': '17.0.0.0.1',
     'author': 'Michel Perrocheau',
     'website': 'https://github.com/myrrkel',
     'summary': "Allows to upload Image from camera to any model",
