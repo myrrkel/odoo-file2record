@@ -1,4 +1,4 @@
-PyMuPDF
+PyMuPDF==1.24.1
 pytesseract
 opencv-python
 mammoth
