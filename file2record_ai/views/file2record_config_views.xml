@@ -8,7 +8,15 @@
             <xpath expr="//field[@name='record_creation_method']" position="after">
                 <field name="ai_completion_id"
                        invisible="record_creation_method != 'ai'"/>
+                <field name="additional_instructions"
+                       invisible="record_creation_method != 'ai'"/>
             </xpath>
         </field>
     </record>
+
+    <menuitem id="menu_ai_file2record" name="File2Record"
+              action="file2record.file2record_config_action"
+              sequence="7"
+              parent="ai_connector.root_ai_connector"/>
+
 </odoo>

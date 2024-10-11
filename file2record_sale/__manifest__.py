@@ -24,6 +24,7 @@
     'data': [
         'security/ir.model.access.csv',
         'security/security.xml',
+        'views/sale_order_views.xml',
     ],
     'assets': {},
     'auto_install': False,

@@ -17,12 +17,17 @@ import lxml.html.clean as html_clean
 _logger = logging.getLogger(__name__)
 
 
-def get_pdf_text(content):
+def get_pdf_text(content, drop_last_page=True):
     buffer = io.BytesIO(content)
     pdf_reader = OdooPdfFileReader(buffer, strict=False)
-    text_content = '\n'.join([page.extract_text() for page in pdf_reader.pages])
-    pdf_reader.stream.close()
-    return text_content
+    if pdf_reader.pages:
+        if len(pdf_reader.pages) > 1 and drop_last_page:
+            pages = pdf_reader.pages[:-1]
+        else:
+            pages = pdf_reader.pages
+        text_content = '\n'.join([page.extract_text() for page in pages])
+        pdf_reader.stream.close()
+        return text_content
 
 
 EXCLUDED_REQUIRED_FIELDS = {
@@ -155,10 +160,12 @@ class BaseModel(models.AbstractModel):
         res = html_sanitize(html, strip_style=True, strip_classes=True, sanitize_attributes=True, sanitize_style=True)
         return str(res)
 
-    def _get_html_from_pdf(self, content):
+    def _get_html_from_pdf(self, content, drop_last_page=True):
         doc = fitz.open("pdf", content)
         html_content = ''
-        for page in doc:
+        for i, page in enumerate(doc):
+            if drop_last_page and i == len(doc) - 1:
+                continue
             page.read_contents()
             img_list = page.get_images()
             for img in img_list:
@@ -215,21 +222,28 @@ class BaseModel(models.AbstractModel):
                     res[key] = value
         return res
 
-    def _get_default_record_creation_prompt(self, content):
+    def _get_default_record_creation_prompt(self, content, additional_instructions=''):
         json_dict = self._get_json_model_fields_description()
-        instructions = '''You are an API that fills the json dictionary provided
+        instructions = '''You are an API. Return the {model} json dictionary provided
 with values found in the document.
 Don't do assertions.
 If you don't find a value in the document, set the value at false.
-If there is no relevant information in the document return an empty dictionary.'''
+If there is no relevant information in the document return an empty dictionary.'''.format(model=self._description)
         prompt_list = [('INSTRUCTIONS', instructions),
                        ('JSON DICTIONARY', json_dict),
                        ('FIELDS DESCRIPTION', self._get_fields_description(json.loads(json_dict))),
                        ('DOCUMENT', content)]
+        if additional_instructions:
+            prompt_list.insert(1, ('ADDITIONAL INSTRUCTIONS', additional_instructions))
         return '\n\n'.join('# %s :\n\n%s' % (key, value) for key, value in prompt_list)
 
     def model_description_excluded_fields(self):
-        return ['id', 'access_token', 'password', 'create_date', 'write_date']
+        res = ['id', 'access_token', 'password', 'create_date', 'write_date']
+        if self.env.context.get('file2record_config_id'):
+            file2record_config_id = self.env.context.get('file2record_config_id')
+            config_id = self.env['file2record.config'].browse(file2record_config_id)
+            res.extend(config_id.excluded_fields.mapped('name'))
+        return res
 
     def _get_model_fields(self):
         field_types = ['html', 'text', 'char', 'boolean', 'integer', 'float', 'many2one', 'one2many']

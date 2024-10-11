@@ -24,6 +24,7 @@
 
                     <group name="bottom">
                         <group>
+                            <field name="excluded_fields" widget="many2many_tags"/>
                             <field name="post_process"/>
                             <field name="model_post_process_method"
                                invisible="post_process != 'method'"/>
