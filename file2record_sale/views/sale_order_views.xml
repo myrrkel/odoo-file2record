@@ -1,0 +1,12 @@
+<odoo>
+    <record id="view_order_form_inherit" model="ir.ui.view">
+        <field name="name">sale.order.form.file2record</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_chatter')]" position="after">
+                <div class="o_attachment_preview"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

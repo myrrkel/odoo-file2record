@@ -18,6 +18,10 @@ class ProductTemplate(models.Model):
         domain = []
         if values.get('name'):
             domain.append([('name', 'ilike', values['name'])])
+            if values.get('description'):
+                domain.append([('description', 'ilike', values['description'])])
+            else:
+                domain.append([('description', 'ilike', values['name'])])
         if values.get('default_code'):
             domain.append([('default_code', 'ilike', values['default_code'])])
         if len(domain) > 1:
