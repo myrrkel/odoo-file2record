@@ -17,7 +17,7 @@ import lxml.html.clean as html_clean
 _logger = logging.getLogger(__name__)
 
 
-def get_pdf_text(content, drop_last_page=True):
+def get_pdf_text(content, drop_last_page=False):
     buffer = io.BytesIO(content)
     pdf_reader = OdooPdfFileReader(buffer, strict=False)
     if pdf_reader.pages:
@@ -160,7 +160,7 @@ class BaseModel(models.AbstractModel):
         res = html_sanitize(html, strip_style=True, strip_classes=True, sanitize_attributes=True, sanitize_style=True)
         return str(res)
 
-    def _get_html_from_pdf(self, content, drop_last_page=True):
+    def _get_html_from_pdf(self, content, drop_last_page=False):
         doc = fitz.open("pdf", content)
         html_content = ''
         for i, page in enumerate(doc):
@@ -186,7 +186,7 @@ class BaseModel(models.AbstractModel):
                 if field.name in EXCLUDED_REQUIRED_FIELDS[self._name]:
                     return False
             exclude_args = ['default', 'compute', 'company_dependent']
-            if field.required and not any(arg in exclude_args for arg in field.args.keys()):
+            if field.required and field.args and not any(arg in exclude_args for arg in field.args.keys()):
                 return True
 
         required_fields = [f for f in self._fields if field_is_required(self._fields[f])]
