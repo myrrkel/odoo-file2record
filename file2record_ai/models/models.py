@@ -17,7 +17,8 @@ class BaseModel(models.AbstractModel):
             if completion_id.prompt_template_id or completion_id.prompt_template:
                 prompt = '%s \n %s' % (completion_id.get_prompt(), content)
             else:
-                prompt = self._get_default_record_creation_prompt(content)
+                self_context = self.with_context(file2record_config_id=config_id.id)
+                prompt = self_context._get_default_record_creation_prompt(content, config_id.additional_instructions)
             res = completion_id.create_completion(prompt=prompt)
         else:
             res = super(BaseModel, self)._get_record_values_from_content(name, content_type, content)
@@ -35,6 +36,8 @@ class BaseModel(models.AbstractModel):
                 return json.loads(res[0])
             else:
                 return json.loads(res[0].answer)
+        elif res and isinstance(res, str):
+            return json.loads(res)
 
     def _get_values_from_attachment_id(self, attachment_id):
         context = {'model': 'ir.attachment', 'res_id': attachment_id}

@@ -17,3 +17,4 @@ class UploadFileConfig(models.Model):
 
     record_creation_method = fields.Selection(selection=_get_record_creation_method_list)
     ai_completion_id = fields.Many2one('ai.completion', string='AI Completion')
+    additional_instructions = fields.Text()

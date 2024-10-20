@@ -43,6 +43,7 @@ class UploadFileConfig(models.Model):
     model_record_creation_method = fields.Char()
     model_post_process_method = fields.Char()
     show_upload_file_button = fields.Boolean(default=True)
+    excluded_fields = fields.Many2many('ir.model.fields', string='Excluded Fields')
 
     @api.model
     def is_file_to_record_button_visible(self, model):
