@@ -12,15 +12,19 @@
     </t>
     <t t-inherit="web.ListView.Buttons" t-inherit-mode="extension" owl="1">
         <xpath expr="//div[hasclass('o_list_buttons')]" position="inside">
-            <t t-call="file2record.ViewUploadRecordButton"/>
+            <t t-if="props.Renderer.name == 'ListRenderer'">
+                <t t-call="file2record.ViewUploadRecordButton"/>
+            </t>
         </xpath>
     </t>
 
     <t t-inherit="web.KanbanView.Buttons" t-inherit-mode="extension" owl="1">
         <xpath expr="//div[hasclass('o_cp_buttons')]" position="inside">
-            <div class="file2record-btn-group">
-                <t t-call="file2record.ViewUploadRecordButton"/>
-            </div>
+            <t t-if="props.Renderer.name == 'KanbanRenderer'">
+                <div class="file2record-btn-group">
+                    <t t-call="file2record.ViewUploadRecordButton"/>
+                </div>
+            </t>
         </xpath>
     </t>
 
