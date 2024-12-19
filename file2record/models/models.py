@@ -250,7 +250,7 @@ If there is no relevant information in the document return an empty dictionary.'
         return res
 
     def _get_model_fields(self):
-        field_types = ['html', 'text', 'char', 'boolean', 'integer', 'float', 'many2one', 'one2many']
+        field_types = ['html', 'text', 'char', 'boolean', 'integer', 'float', 'many2one', 'one2many', 'monetary']
 
         def is_valid_field(field):
             if field.name in self.model_description_excluded_fields():
@@ -284,7 +284,7 @@ If there is no relevant information in the document return an empty dictionary.'
                     empty_dict[field.name] = [field_description]
                 else:
                     empty_dict.pop(field.name)
-            elif field.type in ['integer', 'float']:
+            elif field.type in ['integer', 'float', 'monetary']:
                 empty_dict[field.name] = 0
             elif field.type in ['boolean']:
                 empty_dict[field.name] = False
