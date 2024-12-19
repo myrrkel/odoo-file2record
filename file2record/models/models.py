@@ -156,9 +156,13 @@ class BaseModel(models.AbstractModel):
     def _clean_html(self, html):
         p = re.compile(r'<img[^>]*>')
         html = p.sub('', html)
-        html = html_clean.clean_html(html)
-        res = html_sanitize(html, strip_style=True, strip_classes=True, sanitize_attributes=True, sanitize_style=True)
-        return str(res)
+        try:
+            html = html_clean.clean_html(html)
+            res = html_sanitize(html, strip_style=True, strip_classes=True, sanitize_attributes=True, sanitize_style=True)
+            return str(res)
+        except Exception as err:
+            _logger.error(err, exc_info=True)
+            return html
 
     def _get_html_from_pdf(self, content, drop_last_page=False):
         doc = fitz.open("pdf", content)
@@ -242,7 +246,7 @@ If there is no relevant information in the document return an empty dictionary.'
         if self.env.context.get('file2record_config_id'):
             file2record_config_id = self.env.context.get('file2record_config_id')
             config_id = self.env['file2record.config'].browse(file2record_config_id)
-            res.extend(config_id.excluded_fields.mapped('name'))
+            res.extend(config_id.sudo().excluded_fields.mapped('name'))
         return res
 
     def _get_model_fields(self):
@@ -336,8 +340,12 @@ If there is no relevant information in the document return an empty dictionary.'
             return values
         domain = self._find_or_create_many2one_domain(values)
         if domain:
-            res = self.search(domain, limit=1)
-            return res[0].id if res else False
+            try:
+                res = self.search(domain, limit=1)
+                return res[0].id if res else False
+            except Exception as e:
+                _logger.info(e)
+                return False
 
     def _create_one2many_record(self, values_list):
         res = []
