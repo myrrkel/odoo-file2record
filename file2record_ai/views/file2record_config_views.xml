@@ -10,6 +10,9 @@
                        attrs="{'invisible': [('record_creation_method', '!=', 'ai')]}"/>
                 <field name="additional_instructions"
                        attrs="{'invisible': [('record_creation_method', '!=', 'ai')]}"/>
+                <field name="is_default_ai_completion" invisible="1"/>
+                <field name="default_record_creation_prompt"
+                       attrs="{'invisible': ['|', ('record_creation_method', '!=', 'ai'), ('is_default_ai_completion', '=', False)]}"/>
             </xpath>
         </field>
     </record>

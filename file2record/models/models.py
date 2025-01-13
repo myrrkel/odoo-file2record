@@ -398,6 +398,7 @@ If there is no relevant information in the document return an empty dictionary.'
             _logger.error(err, exc_info=True)
             raise err
 
+    @api.model
     def create_records_from_attachments(self, res_ids):
         res = []
         for res_id in res_ids:
