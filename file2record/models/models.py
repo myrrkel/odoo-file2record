@@ -95,7 +95,7 @@ class BaseModel(models.AbstractModel):
         if config_id and config_id.post_process == 'code':
             values = config_id.eval_post_process_code(values)
         if config_id and config_id.post_process == 'method':
-            post_process_function = getattr(self, self.post_process)
+            post_process_function = getattr(self.env[config_id.model], config_id.model_post_process_method)
             values = post_process_function(values)
 
         if not values:
@@ -268,6 +268,7 @@ If there is no relevant information in the document return an empty dictionary.'
             return True
         model_fields = [self._fields[key] for key in self._fields if is_valid_field(self._fields[key])]
         return model_fields
+
     def _get_json_model_fields_description(self):
         model_fields = self._get_model_fields()
         empty_dict = {field.name: '' for field in model_fields}
@@ -395,7 +396,7 @@ If there is no relevant information in the document return an empty dictionary.'
             _logger.info('Cleaned up values: %s', values)
             return self.env[self._name].create(values)
         except Exception as err:
-            _logger.error(err, exc_info=True)
+            _logger.error(err, exc_info=True, stack_info=True)
             raise err
 
     @api.model
