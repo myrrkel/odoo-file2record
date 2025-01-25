@@ -6,7 +6,7 @@ import {ListController} from "@web/views/list/list_controller";
 import {KanbanController} from "@web/views/kanban/kanban_controller";
 import {FileUploader} from "@web/views/fields/file_handler";
 import {standardWidgetProps} from "@web/views/widgets/standard_widget_props";
-import {Component, onWillStart} from "@odoo/owl";
+import {Component, onWillStart, onWillRender, onMounted} from "@odoo/owl";
 import { patch } from "@web/core/utils/patch";
 
 export class RecordFileUploader extends Component {
@@ -89,7 +89,10 @@ RecordFileUploader.fieldDependencies = {
 
 registry.category("views").add("record_file_uploader", RecordFileUploader);
 
-function _isFile2RecordButtonVisible(self) {
+async function _isFile2RecordButtonVisible(self) {
+    if (!await self.user.hasGroup("file2record.group_file_upload_user")) {
+        return false;
+    }
     try {
         return self.orm.call(
             self.props.resModel,
@@ -116,6 +119,7 @@ patch(ListController.prototype, "file2record.ListControllerPatch", {
 
     setup() {
         this._super();
+        this.user = useService("user");
         onWillStart(async () => {
             try {
                 this.props.isUploadButtonVisible = await _isFile2RecordButtonVisible(this);
@@ -138,6 +142,7 @@ patch(KanbanController.prototype, "file2record.KanbanControllerPatch", {
 
     setup() {
         this._super();
+        this.user = useService("user");
         this.orm = useService('orm');
         onWillStart(async () => {
             try {
