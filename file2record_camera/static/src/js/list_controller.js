@@ -63,7 +63,7 @@ class WebcamUpload extends Component {
     async onUploadComplete(att_id) {
         const action = await this.orm.call(this.props.resModel,
             "create_records_from_attachments",
-            ["", [att_id]],
+            [[att_id]],
             {
                 context: this.extraContext,
             });

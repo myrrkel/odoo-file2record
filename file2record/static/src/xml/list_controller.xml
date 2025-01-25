@@ -3,7 +3,7 @@
     <t t-name="file2record.ViewUploadRecordButton" owl="1">
         <RecordFileUploader>
             <t t-set-slot="default">
-                <button t-ref="file2recordButton" type="button" class="btn btn-secondary d-none btn-file2record"
+                <button t-ref="file2recordButton" type="button" class="btn btn-secondary btn-file2record"
                         data-tooltip="Upload file to create a new record">
                     <i class="fa fa-upload"/>
                 </button>
@@ -12,14 +12,14 @@
     </t>
     <t t-inherit="web.ListView.Buttons" t-inherit-mode="extension" owl="1">
         <xpath expr="//div[hasclass('o_list_buttons')]" position="inside">
-            <t t-call="file2record.ViewUploadRecordButton"/>
+            <t t-if="props.isUploadButtonVisible" t-call="file2record.ViewUploadRecordButton"/>
         </xpath>
     </t>
 
     <t t-inherit="web.KanbanView.Buttons" t-inherit-mode="extension" owl="1">
         <xpath expr="//div[hasclass('o_cp_buttons')]" position="inside">
             <div class="file2record-btn-group">
-                <t t-call="file2record.ViewUploadRecordButton"/>
+                <t t-if="props.isUploadButtonVisible" t-call="file2record.ViewUploadRecordButton"/>
             </div>
         </xpath>
     </t>

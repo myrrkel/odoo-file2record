@@ -38,6 +38,12 @@ EXCLUDED_REQUIRED_FIELDS = {
 class BaseModel(models.AbstractModel):
     _inherit = 'base'
 
+    @api.model
+    def is_file_to_record_button_visible(self):
+        if self.env['file2record.config'].sudo().search([('model', '=', self._name),
+                                                  ('show_upload_file_button', '=', True)]):
+            return True
+
     def _is_attachment_txt(self, attachment_id):
         return attachment_id.mimetype in ['text/plain', 'text/html']
 
