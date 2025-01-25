@@ -29,11 +29,18 @@ export class RecordFileUploader extends Component {
         file2RecordButton.removeClass('d-none');
     }
 
-    async isFile2RecordButtonVisible() {
-            return await this.orm.call('file2record.config', 'is_file_to_record_button_visible',
-                [this.env.searchModel.resModel],
-                {context: {...this.extraContext, ...this.env.searchModel.context},});
-        }
+async isFile2RecordButtonVisible() {
+    try {
+        return await this.orm.call(
+            "file2record.config",
+            "is_file_to_record_button_visible",
+            [this.env.searchModel.resModel],
+            {
+                context: { ...this.extraContext, ...this.env.searchModel.context },
+            }
+        );
+    } catch (error) {return false}
+}
 
     async onFileUploaded(file) {
         const attData = {

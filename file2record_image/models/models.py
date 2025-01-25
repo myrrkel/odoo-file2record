@@ -76,7 +76,7 @@ class BaseModel(models.AbstractModel):
             if len(res.keys()) <= 1 and params:
                 if not image_osd:
                     img = img.rotate(-90, expand=True)
-                text = self.get_retry_ocr_text(img)
+                text = self.get_retry_ocr_text(img, params=params)
                 _logger.info('OCR Retry : %s', text)
                 res = self._get_record_values(attachment_id.name, 'image', text.strip())
                 res['retry'] = True
