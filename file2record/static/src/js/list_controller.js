@@ -140,7 +140,11 @@ patch(KanbanController.prototype, "file2record.KanbanControllerPatch", {
         this._super();
         this.orm = useService('orm');
         onWillStart(async () => {
-            this.props.isUploadButtonVisible = await _isFile2RecordButtonVisible(this);
+            try {
+                this.props.isUploadButtonVisible = await _isFile2RecordButtonVisible(this);
+            } catch (error) {
+                this.props.isUploadButtonVisible = false;
+            }
         });
 
     },
