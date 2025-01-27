@@ -59,9 +59,8 @@ class BaseModel(models.AbstractModel):
             image_osd = {}
             if config_id and config_id.preprocess_with_osd:
                 image_osd = self.get_tesseract_image_osd(img)
-                if image_osd.get('rotate'):
+                if image_osd.get('rotate') and image_osd.get('orientation_conf') >= 0.5:
                     img = img.rotate(360 - image_osd['rotate'], expand=True)
-                    attachment_id.datas = image_to_base64(img, 'PNG')
 
                 if config_id and config_id.get_lang_from_ai:
                     text = pytesseract.image_to_string(img, timeout=10)
@@ -74,13 +73,14 @@ class BaseModel(models.AbstractModel):
             _logger.info('OCR Result : %s', text)
             res = self._get_record_values(attachment_id.name, 'image', text.strip())
             if len(res.keys()) <= 1 and params:
-                if not image_osd:
-                    img = img.rotate(-90, expand=True)
-                text = self.get_retry_ocr_text(img, params=params)
+                retry_img = img.rotate(-90, expand=True) if not image_osd else img
+                text = self.get_retry_ocr_text(retry_img, params=params)
                 _logger.info('OCR Retry : %s', text)
                 res = self._get_record_values(attachment_id.name, 'image', text.strip())
                 res['retry'] = True
 
+            if len(res.keys()) > 1 and image_osd.get('rotate') and image_osd.get('orientation_conf') >= 0.5:
+                attachment_id.datas = image_to_base64(img, 'PNG')
             return res
 
         return super(BaseModel, self)._get_values_from_attachment(attachment_id, content)
