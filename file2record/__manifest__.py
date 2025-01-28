@@ -13,7 +13,7 @@
         'web',
     ],
     'external_dependencies': {
-        'python': ['mammoth'],
+        'python': ['PyMuPDF', 'mammoth'],
     },
     'category': 'EDI',
     'complexity': 'easy',
