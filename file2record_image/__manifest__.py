@@ -13,7 +13,7 @@
         'file2record',
     ],
     'external_dependencies': {
-        'python': ['pytesseract', 'opencv-python'],
+        'python': ['pytesseract'],
         'bin': ['tesseract'],
     },
     'category': 'EDI',
