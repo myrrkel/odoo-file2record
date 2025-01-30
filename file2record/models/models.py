@@ -408,9 +408,10 @@ If there is no relevant information in the document return an empty dictionary.'
     @api.model
     def create_records_from_attachments(self, res_ids):
         res = []
+        context = {'lang': self.env.user.lang}
         for res_id in res_ids:
             try:
-                record_id = self._create_record_from_attachment(res_id)
+                record_id = self.with_context(context)._create_record_from_attachment(res_id)
                 if record_id:
                     res.append(record_id.id)
             except Exception as err:
