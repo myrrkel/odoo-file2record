@@ -20,7 +20,8 @@ class UploadFileConfig(models.Model):
     def _get_data_type_list(self):
         return [('text', _('Text')),
                 ('pdf', _('PDF')),
-                ('doc', _('Word/OpenOffice')),
+                ('doc', _('Word / Writer OpenOffice')),
+                ('xls', _('Excel / Calc OpenOffice')),
                 ('html', _('HTML')),
                 ('xml', _('XML')),
                 ('bin', _('Binary')),

@@ -5,7 +5,8 @@ from odoo import models, _, api
 from odoo.tools import plaintext2html, html2plaintext, html_sanitize
 from odoo.exceptions import UserError
 from odoo.tools.pdf import OdooPdfFileReader
-from odoo.osv import expression
+import openpyxl
+import csv
 import fitz
 import json
 import mammoth
@@ -29,6 +30,27 @@ def get_pdf_text(content, drop_last_page=False):
         pdf_reader.stream.close()
         return text_content
 
+
+def extract_xlsx_content(raw_content, output_format='markdown'):
+    workbook = openpyxl.load_workbook(io.BytesIO(raw_content), data_only=True)
+    content = []
+
+    for i, sheet_name in enumerate(workbook.sheetnames):
+        sheet = workbook[sheet_name]
+        sheet_content = [f"# Sheet {i + 1} : {sheet_name}\n"]
+        if output_format == 'markdown':
+            for row in sheet.iter_rows(values_only=True):
+                row_text = " | ".join(str(cell) if cell else '' for cell in row)
+                sheet_content.append("| %s |" % row_text)
+        elif output_format == 'csv':
+            output = io.StringIO()
+            csv_writer = csv.writer(output)
+            csv_writer.writerows(sheet.iter_rows(values_only=True))
+            sheet_content.append(output.getvalue())
+
+        content.append("\n".join(sheet_content))
+
+    return "\n".join(content)
 
 EXCLUDED_REQUIRED_FIELDS = {
     'product.template': ['product_variant_ids'],
@@ -56,7 +78,11 @@ class BaseModel(models.AbstractModel):
 
     def _is_attachment_document(self, attachment_id):
         extension = attachment_id.name.lower().split('.')[-1]
-        return 'document' in attachment_id.mimetype or extension in ['docx', 'odt']
+        return 'word' in attachment_id.mimetype or extension in ['docx', 'odt']
+
+    def _is_attachment_xls(self, attachment_id):
+        extension = attachment_id.name.lower().split('.')[-1]
+        return 'spreadsheet' in attachment_id.mimetype or extension in ['xlsx', 'xls']
 
     def _create_record_from_attachment(self, res_id):
         attachment_id = self.env['ir.attachment'].browse(res_id)
@@ -79,6 +105,8 @@ class BaseModel(models.AbstractModel):
             values = self._get_record_values(attachment_id.name, 'pdf', content)
         elif self._is_attachment_document(attachment_id):
             values = self._get_record_values(attachment_id.name, 'doc', content)
+        elif self._is_attachment_xls(attachment_id):
+            values = self._get_record_values(attachment_id.name, 'xls', content)
         elif self._is_attachment_txt(attachment_id):
             if isinstance(content, bytes):
                 content = content.decode()
@@ -119,6 +147,8 @@ class BaseModel(models.AbstractModel):
             if content_type == 'doc':
                 res = mammoth.convert_to_html(io.BytesIO(raw_content))
                 content = self._clean_html(res.value)
+            if content_type == 'xls':
+                content = extract_xlsx_content(raw_content, output_format='csv')
         elif content_type == 'html':
             content = self._clean_html(raw_content)
         else:
