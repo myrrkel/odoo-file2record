@@ -84,16 +84,23 @@ class BaseModel(models.AbstractModel):
         extension = attachment_id.name.lower().split('.')[-1]
         return 'spreadsheet' in attachment_id.mimetype or extension in ['xlsx', 'xls']
 
-    def _create_record_from_attachment(self, res_id):
+    def _create_record_from_attachment(self, res_id, default_values=None):
         attachment_id = self.env['ir.attachment'].browse(res_id)
         values = self._get_values_from_attachment_id(res_id)
         if values:
-            record_id = self._create_record_from_dict(values)
-            if record_id:
-                attachment_id.res_id = record_id.id
-                attachment_id.res_model = self._name
-                attachment_id.register_as_main_attachment()
+            if default_values:
+                values.update(default_values)
+            if attachment_id.res_id:
+                record_id = self.env[attachment_id.res_model].browse(attachment_id.res_id)
+                record_id.write(values)
                 return record_id
+            else:
+                record_id = self._create_record_from_dict(values)
+                if record_id:
+                    attachment_id.res_id = record_id.id
+                    attachment_id.res_model = self._name
+                    attachment_id.register_as_main_attachment()
+                    return record_id
 
     def _get_values_from_attachment_id(self, attachment_id):
         attachment_id = self.env['ir.attachment'].browse(attachment_id)
@@ -436,12 +443,12 @@ If there is no relevant information in the document return an empty dictionary.'
             raise err
 
     @api.model
-    def create_records_from_attachments(self, res_ids):
+    def create_records_from_attachments(self, res_ids, default_values=None):
         res = []
         context = {'lang': self.env.user.lang}
         for res_id in res_ids:
             try:
-                record_id = self.with_context(context)._create_record_from_attachment(res_id)
+                record_id = self.with_context(context)._create_record_from_attachment(res_id, default_values)
                 if record_id:
                     res.append(record_id.id)
             except Exception as err:
