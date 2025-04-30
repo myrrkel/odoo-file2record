@@ -45,6 +45,8 @@ class UploadFileConfig(models.Model):
     model_post_process_method = fields.Char()
     show_upload_file_button = fields.Boolean(default=True)
     excluded_fields = fields.Many2many('ir.model.fields', string='Excluded Fields')
+    fields = fields.Many2many('ir.model.fields', 'file2record_config_fields_rel', 'config_id', 'field_id',
+                              string='Fields')
 
     def eval_record_creation_code(self, content):
         res = False

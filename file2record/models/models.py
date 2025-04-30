@@ -57,6 +57,7 @@ EXCLUDED_REQUIRED_FIELDS = {
 }
 
 
+# noinspection PyInconsistentReturns
 class BaseModel(models.AbstractModel):
     _inherit = 'base'
 
@@ -292,11 +293,23 @@ If there is no relevant information in the document return an empty dictionary.'
             res.extend(config_id.sudo().excluded_fields.mapped('name'))
         return res
 
+    def model_description_fields(self):
+        res = []
+        if self.env.context.get('file2record_config_id'):
+            file2record_config_id = self.env.context.get('file2record_config_id')
+            config_id = self.env['file2record.config'].browse(file2record_config_id)
+            res.extend(config_id.sudo().fields.mapped('name'))
+        return res
+
     def _get_model_fields(self):
         field_types = ['html', 'text', 'char', 'boolean', 'integer', 'float', 'many2one', 'one2many', 'monetary']
+        excluded_fields = self.model_description_excluded_fields()
+        fields = self.model_description_fields()
 
         def is_valid_field(field):
-            if field.name in self.model_description_excluded_fields():
+            if fields and field.name not in fields:
+                return False
+            if field.name in excluded_fields:
                 return False
             if not field.store:
                 return False
