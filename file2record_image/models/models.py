@@ -85,7 +85,6 @@ class BaseModel(models.AbstractModel):
                 text = self.get_retry_ocr_text(Image.open(io.BytesIO(content)), params={'config': '--psm 6'})
                 _logger.info('OCR Retry : %s', text)
                 res = self._get_record_values(attachment_id.name, 'image', text.strip())
-                res['retry'] = True
 
             # if len(res.keys()) > 1 and image_osd.get('rotate') and image_osd.get('orientation_conf') >= 0.5:
             #     attachment_id.datas = image_to_base64(img, 'PNG')
