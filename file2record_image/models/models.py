@@ -81,11 +81,19 @@ class BaseModel(models.AbstractModel):
             text = self.get_text_from_image(content)
             _logger.info('OCR Result : %s', text)
             res = self._get_record_values(attachment_id.name, 'image', text.strip())
-            if len(res.keys()) <= 1:
+            if len(res.keys()) <= 1 or res.get('file_processing_error', False):
                 text = self.get_retry_ocr_text(Image.open(io.BytesIO(content)), params={'config': '--psm 6'})
                 _logger.info('OCR Retry : %s', text)
                 res = self._get_record_values(attachment_id.name, 'image', text.strip())
-
+                _logger.info('OCR Retry Result : %s', text)
+                if len(res.keys()) <= 1 or res.get('file_processing_error', False):
+                    config_id = self.get_file2record_config('image')
+                    if hasattr(config_id, 'retry_ocr_completion_id') and config_id.retry_ocr_completion_id:
+                        _logger.info('OCR Retry #2 : %s', text)
+                        text = config_id.retry_ocr_completion_id.create_completion(attachment_id.id,
+                                                                                   prompt='get text with OCR')
+                        _logger.info('OCR Retry #2 Result : %s', text)
+                        res = self._get_record_values(attachment_id.name, 'image', text.strip())
             # if len(res.keys()) > 1 and image_osd.get('rotate') and image_osd.get('orientation_conf') >= 0.5:
             #     attachment_id.datas = image_to_base64(img, 'PNG')
             return res
@@ -99,6 +107,7 @@ class BaseModel(models.AbstractModel):
             return pytesseract.image_to_string(img, timeout=timeout, **params)
         except Exception as err:
             _logger.error(err, exc_info=True)
+            pass
             return ''
 
     def get_ocr_text(self, img, timeout=10, params=None):

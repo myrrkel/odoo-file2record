@@ -129,6 +129,8 @@ class BaseModel(models.AbstractModel):
         return values
 
     def _get_record_values(self, name, content_type, content):
+        if not content:
+            return {}
         config_id = self.get_file2record_config(content_type)
         if config_id and config_id.record_creation_method == 'code':
             values = config_id.eval_record_creation_code(content)
@@ -285,19 +287,22 @@ If there is no relevant information in the document return an empty dictionary.'
             prompt_list.insert(1, ('ADDITIONAL INSTRUCTIONS', additional_instructions))
         return '\n\n'.join('# %s :\n\n%s' % (key, value) for key, value in prompt_list)
 
-    def model_description_excluded_fields(self):
-        res = ['id', 'access_token', 'password', 'create_date', 'write_date']
+    def get_env_file2record_config(self):
         if self.env.context.get('file2record_config_id'):
             file2record_config_id = self.env.context.get('file2record_config_id')
-            config_id = self.env['file2record.config'].browse(file2record_config_id)
+            return self.env['file2record.config'].browse(file2record_config_id)
+
+    def model_description_excluded_fields(self):
+        res = ['id', 'access_token', 'password', 'create_date', 'write_date']
+        config_id = self.get_env_file2record_config()
+        if config_id:
             res.extend(config_id.sudo().excluded_fields.mapped('name'))
         return res
 
     def model_description_fields(self):
         res = []
-        if self.env.context.get('file2record_config_id'):
-            file2record_config_id = self.env.context.get('file2record_config_id')
-            config_id = self.env['file2record.config'].browse(file2record_config_id)
+        config_id = self.get_env_file2record_config()
+        if config_id:
             res.extend(config_id.sudo().fields.mapped('name'))
         return res
 

@@ -2,7 +2,7 @@
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/algpl.html).
 {
     'name': 'File2Record',
-    'version': '16.1.0.1',
+    'version': '16.1.0.2',
     'author': 'Michel Perrocheau',
     'website': 'https://github.com/myrrkel',
     'summary': "Allows to upload file for any model",

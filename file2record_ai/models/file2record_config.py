@@ -17,6 +17,8 @@ class UploadFileConfig(models.Model):
 
     record_creation_method = fields.Selection(selection=_get_record_creation_method_list)
     ai_completion_id = fields.Many2one('ai.completion', string='AI Completion')
+    ocr_completion_id = fields.Many2one('ai.completion', string='OCR Completion')
+    retry_ocr_completion_id = fields.Many2one('ai.completion', string='Retry OCR Completion')
     additional_instructions = fields.Text()
     default_record_creation_prompt = fields.Text(compute='_compute_default_record_creation_prompt')
     is_default_ai_completion = fields.Boolean(compute='_compute_is_default_ai_completion')

@@ -8,6 +8,8 @@
             <xpath expr="//field[@name='record_creation_method']" position="after">
                 <field name="ai_completion_id"
                        attrs="{'invisible': [('record_creation_method', '!=', 'ai')]}"/>
+                <field name="ocr_completion_id"/>
+                <field name="retry_ocr_completion_id"/>
                 <field name="additional_instructions"
                        attrs="{'invisible': [('record_creation_method', '!=', 'ai')]}"/>
                 <field name="is_default_ai_completion" invisible="1"/>
