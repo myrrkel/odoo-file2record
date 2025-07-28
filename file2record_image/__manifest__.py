@@ -13,7 +13,7 @@
         'file2record',
     ],
     'external_dependencies': {
-        'python': ['pytesseract'],
+        'python': ['pytesseract', 'pillow-heif'],
         'bin': ['tesseract'],
     },
     'category': 'EDI',

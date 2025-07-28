@@ -5,12 +5,14 @@ from odoo import models
 from odoo.tools import html2plaintext
 import io
 from PIL import Image
+from pillow_heif import register_heif_opener
 import pytesseract
 import logging
 import fitz
 from .image_processing import transform_image
 _logger = logging.getLogger(__name__)
 
+register_heif_opener()
 
 class BaseModel(models.AbstractModel):
     _inherit = 'base'
@@ -37,7 +39,7 @@ class BaseModel(models.AbstractModel):
 
     def _is_attachment_image(self, attachment_id):
         extension = attachment_id.name.lower().split('.')[-1]
-        return 'image' in attachment_id.mimetype or extension in ['jpg', 'png']
+        return 'image' in attachment_id.mimetype or extension in ['jpg', 'png', 'jpeg', 'heic']
 
     def get_guess_language_prompt(self, text):
         languages = ','.join(pytesseract.get_languages(config=''))
@@ -83,19 +85,17 @@ class BaseModel(models.AbstractModel):
             res = self._get_record_values(attachment_id.name, 'image', text.strip())
             if len(res.keys()) <= 1 or res.get('file_processing_error', False):
                 text = self.get_retry_ocr_text(Image.open(io.BytesIO(content)), params={'config': '--psm 6'})
-                _logger.info('OCR Retry : %s', text)
+                _logger.info('OCR Retry')
                 res = self._get_record_values(attachment_id.name, 'image', text.strip())
                 _logger.info('OCR Retry Result : %s', text)
                 if len(res.keys()) <= 1 or res.get('file_processing_error', False):
                     config_id = self.get_file2record_config('image')
                     if hasattr(config_id, 'retry_ocr_completion_id') and config_id.retry_ocr_completion_id:
-                        _logger.info('OCR Retry #2 : %s', text)
+                        _logger.info('OCR Retry #2')
                         text = config_id.retry_ocr_completion_id.create_completion(attachment_id.id,
                                                                                    prompt='get text with OCR')
                         _logger.info('OCR Retry #2 Result : %s', text)
                         res = self._get_record_values(attachment_id.name, 'image', text.strip())
-            # if len(res.keys()) > 1 and image_osd.get('rotate') and image_osd.get('orientation_conf') >= 0.5:
-            #     attachment_id.datas = image_to_base64(img, 'PNG')
             return res
 
         return super(BaseModel, self)._get_values_from_attachment(attachment_id, content)
@@ -117,7 +117,7 @@ class BaseModel(models.AbstractModel):
         return self._get_ocr_text(ocr_image, timeout=timeout, params=params)
 
     def get_retry_ocr_text(self, img, timeout=10, params=None):
-        ocr_image = transform_image(img, size_ratio=3, adaptive_sharpening=True, median_filter=True, contrast=2)
+        ocr_image = transform_image(img, size_ratio=0.5, adaptive_sharpening=True, median_filter=True, contrast=2)
         return self._get_ocr_text(ocr_image, timeout=timeout, params=params)
 
     def get_mixed_ocr_text(self, img, timeout=10, params=None):

@@ -6,6 +6,7 @@ File2Record Image
 <img src="./static/description/icon.png" alt="File2Record Logo" style="width:100px;"/>
 
 This module allows to upload an image to any model to create a new record with OCR.
+Supported image formats : JPEG, PNG, HEIC
 
 ## Usage
 
