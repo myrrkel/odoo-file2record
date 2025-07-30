@@ -17,7 +17,9 @@ class BaseModel(models.AbstractModel):
                 return {}
             completion_id = config_id.ai_completion_id
             if completion_id.prompt_template_id or completion_id.prompt_template:
-                prompt = '%s \n %s' % (completion_id.get_prompt(), content)
+                prompt = completion_id.get_prompt()
+                prompt = prompt.replace('{ADDITIONAL_INSTRUCTIONS}', config_id.additional_instructions)
+                prompt = '%s \n %s' % (prompt, content)
             else:
                 self_context = self.with_context(file2record_config_id=config_id.id)
                 prompt = self_context._get_default_record_creation_prompt(content, config_id.additional_instructions)
