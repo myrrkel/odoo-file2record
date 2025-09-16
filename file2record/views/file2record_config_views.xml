@@ -52,12 +52,12 @@
         <field name="name">file2record.config.view.tree</field>
         <field name="model">file2record.config</field>
         <field name="arch" type="xml">
-            <tree string="File2Record Configurations">
+            <list string="File2Record Configurations">
                 <field name="name"/>
                 <field name="description"/>
                 <field name="model_id"/>
                 <field name="data_type"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -65,7 +65,7 @@
         <field name="name">File2Record Configurations</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">file2record.config</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 No File2Record Configuration

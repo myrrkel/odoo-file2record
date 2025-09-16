@@ -8,8 +8,16 @@ import {FileUploader} from "@web/views/fields/file_handler";
 import {standardWidgetProps} from "@web/views/widgets/standard_widget_props";
 import {Component, onWillStart, onWillRender, onMounted} from "@odoo/owl";
 import { patch } from "@web/core/utils/patch";
+import { user } from "@web/core/user";
+
 
 export class RecordFileUploader extends Component {
+    static template = 'file2record.RecordFileUploader';
+    static components = {
+        FileUploader,
+    };
+    static props = {record: {type: Object, optional: true}}
+
     setup() {
         this.orm = useService("orm");
         this.action = useService("action");
@@ -90,7 +98,7 @@ RecordFileUploader.fieldDependencies = {
 registry.category("views").add("record_file_uploader", RecordFileUploader);
 
 async function _isFile2RecordButtonVisible(self) {
-    if (!await self.user.hasGroup("file2record.group_file_upload_user")) {
+    if (!await user.hasGroup("file2record.group_file_upload_user")) {
         return false;
     }
     try {
@@ -112,38 +120,43 @@ ListController.components = {
     RecordFileUploader,
 };
 
-patch(ListController.prototype, "file2record.ListControllerPatch", {
-    props: {...ListController.props,
+export const ListControllerPatch = {
+    props: {
+        ...ListController.props,
         isUploadButtonVisible: { type: Boolean, optional: true },
     },
 
     setup() {
-        this._super();
-        this.user = useService("user");
+        super.setup();
+        this.orm = useService("orm");
         onWillStart(async () => {
             try {
-                this.props.isUploadButtonVisible = await _isFile2RecordButtonVisible(this);
+                const isVisible = await _isFile2RecordButtonVisible(this);
+                this.props.isUploadButtonVisible = isVisible;
             } catch (error) {
+                console.error('Error checking file2record button visibility:', error);
                 this.props.isUploadButtonVisible = false;
             }
         });
     },
-});
+};
+
+patch(ListController.prototype, ListControllerPatch);
 
 KanbanController.components = {
     ...KanbanController.components,
     RecordFileUploader,
 };
 
-patch(KanbanController.prototype, "file2record.KanbanControllerPatch", {
-    props: {...KanbanController.props,
-        isUploadButtonVisible: { type: Boolean, optional: true },
+export const KanbanControllerPatch = {
+    props: {
+        ...KanbanController.props,
+        isUploadButtonVisible: {type: Boolean, optional: true},
     },
 
     setup() {
-        this._super();
-        this.user = useService("user");
-        this.orm = useService('orm');
+        super.setup();
+        this.orm = useService("orm");
         onWillStart(async () => {
             try {
                 this.props.isUploadButtonVisible = await _isFile2RecordButtonVisible(this);
@@ -151,6 +164,8 @@ patch(KanbanController.prototype, "file2record.KanbanControllerPatch", {
                 this.props.isUploadButtonVisible = false;
             }
         });
+    }
+}
 
-    },
-});
+
+patch(KanbanController.prototype, KanbanControllerPatch);

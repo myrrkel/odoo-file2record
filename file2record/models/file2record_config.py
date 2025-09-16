@@ -47,7 +47,6 @@ class UploadFileConfig(models.Model):
     excluded_fields = fields.Many2many('ir.model.fields', string='Excluded Fields')
     fields = fields.Many2many('ir.model.fields', 'file2record_config_fields_rel', 'config_id', 'field_id',
                               string='Fields')
-    excluded_fields = fields.Many2many('ir.model.fields', string='Excluded Fields')
 
     @api.model
     def is_file_to_record_button_visible(self, model):
