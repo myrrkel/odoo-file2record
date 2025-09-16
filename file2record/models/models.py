@@ -5,7 +5,8 @@ from odoo import models, _, api
 from odoo.tools import plaintext2html, html2plaintext, html_sanitize
 from odoo.exceptions import UserError
 from odoo.tools.pdf import OdooPdfFileReader
-from odoo.osv import expression
+import openpyxl
+import csv
 import fitz
 import json
 import mammoth
@@ -30,13 +31,41 @@ def get_pdf_text(content, drop_last_page=False):
         return text_content
 
 
+def extract_xlsx_content(raw_content, output_format='markdown'):
+    workbook = openpyxl.load_workbook(io.BytesIO(raw_content), data_only=True)
+    content = []
+
+    for i, sheet_name in enumerate(workbook.sheetnames):
+        sheet = workbook[sheet_name]
+        sheet_content = [f"# Sheet {i + 1} : {sheet_name}\n"]
+        if output_format == 'markdown':
+            for row in sheet.iter_rows(values_only=True):
+                row_text = " | ".join(str(cell) if cell else '' for cell in row)
+                sheet_content.append("| %s |" % row_text)
+        elif output_format == 'csv':
+            output = io.StringIO()
+            csv_writer = csv.writer(output)
+            csv_writer.writerows(sheet.iter_rows(values_only=True))
+            sheet_content.append(output.getvalue())
+
+        content.append("\n".join(sheet_content))
+
+    return "\n".join(content)
+
 EXCLUDED_REQUIRED_FIELDS = {
     'product.template': ['product_variant_ids'],
 }
 
 
+# noinspection PyInconsistentReturns
 class BaseModel(models.AbstractModel):
     _inherit = 'base'
+
+    @api.model
+    def is_file_to_record_button_visible(self):
+        if self.env['file2record.config'].sudo().search([('model', '=', self._name),
+                                                  ('show_upload_file_button', '=', True)]):
+            return True
 
     def _is_attachment_txt(self, attachment_id):
         return attachment_id.mimetype in ['text/plain', 'text/html']
@@ -50,18 +79,29 @@ class BaseModel(models.AbstractModel):
 
     def _is_attachment_document(self, attachment_id):
         extension = attachment_id.name.lower().split('.')[-1]
-        return 'document' in attachment_id.mimetype or extension in ['docx', 'odt']
+        return 'word' in attachment_id.mimetype or extension in ['docx', 'odt']
 
-    def _create_record_from_attachment(self, res_id):
+    def _is_attachment_xls(self, attachment_id):
+        extension = attachment_id.name.lower().split('.')[-1]
+        return 'spreadsheet' in attachment_id.mimetype or extension in ['xlsx', 'xls']
+
+    def _create_record_from_attachment(self, res_id, default_values=None):
         attachment_id = self.env['ir.attachment'].browse(res_id)
         values = self._get_values_from_attachment_id(res_id)
         if values:
-            record_id = self._create_record_from_dict(values)
-            if record_id:
-                attachment_id.res_id = record_id.id
-                attachment_id.res_model = self._name
-                attachment_id.register_as_main_attachment()
+            if default_values:
+                values.update(default_values)
+            if attachment_id.res_id:
+                record_id = self.env[attachment_id.res_model].browse(attachment_id.res_id)
+                record_id.write(values)
                 return record_id
+            else:
+                record_id = self._create_record_from_dict(values)
+                if record_id:
+                    attachment_id.res_id = record_id.id
+                    attachment_id.res_model = self._name
+                    attachment_id.register_as_main_attachment()
+                    return record_id
 
     def _get_values_from_attachment_id(self, attachment_id):
         attachment_id = self.env['ir.attachment'].browse(attachment_id)
@@ -73,6 +113,8 @@ class BaseModel(models.AbstractModel):
             values = self._get_record_values(attachment_id.name, 'pdf', content)
         elif self._is_attachment_document(attachment_id):
             values = self._get_record_values(attachment_id.name, 'doc', content)
+        elif self._is_attachment_xls(attachment_id):
+            values = self._get_record_values(attachment_id.name, 'xls', content)
         elif self._is_attachment_txt(attachment_id):
             if isinstance(content, bytes):
                 content = content.decode()
@@ -87,6 +129,8 @@ class BaseModel(models.AbstractModel):
         return values
 
     def _get_record_values(self, name, content_type, content):
+        if not content:
+            return {}
         config_id = self.get_file2record_config(content_type)
         if config_id and config_id.record_creation_method == 'code':
             values = config_id.eval_record_creation_code(content)
@@ -95,7 +139,7 @@ class BaseModel(models.AbstractModel):
         if config_id and config_id.post_process == 'code':
             values = config_id.eval_post_process_code(values)
         if config_id and config_id.post_process == 'method':
-            post_process_function = getattr(self, self.post_process)
+            post_process_function = getattr(self.env[config_id.model], config_id.model_post_process_method)
             values = post_process_function(values)
 
         if not values:
@@ -113,6 +157,8 @@ class BaseModel(models.AbstractModel):
             if content_type == 'doc':
                 res = mammoth.convert_to_html(io.BytesIO(raw_content))
                 content = self._clean_html(res.value)
+            if content_type == 'xls':
+                content = extract_xlsx_content(raw_content, output_format='csv')
         elif content_type == 'html':
             content = self._clean_html(raw_content)
         else:
@@ -241,19 +287,34 @@ If there is no relevant information in the document return an empty dictionary.'
             prompt_list.insert(1, ('ADDITIONAL INSTRUCTIONS', additional_instructions))
         return '\n\n'.join('# %s :\n\n%s' % (key, value) for key, value in prompt_list)
 
-    def model_description_excluded_fields(self):
-        res = ['id', 'access_token', 'password', 'create_date', 'write_date']
+    def get_env_file2record_config(self):
         if self.env.context.get('file2record_config_id'):
             file2record_config_id = self.env.context.get('file2record_config_id')
-            config_id = self.env['file2record.config'].browse(file2record_config_id)
+            return self.env['file2record.config'].browse(file2record_config_id)
+
+    def model_description_excluded_fields(self):
+        res = ['id', 'access_token', 'password', 'create_date', 'write_date']
+        config_id = self.get_env_file2record_config()
+        if config_id:
             res.extend(config_id.sudo().excluded_fields.mapped('name'))
+        return res
+
+    def model_description_fields(self):
+        res = []
+        config_id = self.get_env_file2record_config()
+        if config_id:
+            res.extend(config_id.sudo().fields.mapped('name'))
         return res
 
     def _get_model_fields(self):
         field_types = ['html', 'text', 'char', 'boolean', 'integer', 'float', 'many2one', 'one2many', 'monetary']
+        excluded_fields = self.model_description_excluded_fields()
+        fields = self.model_description_fields()
 
         def is_valid_field(field):
-            if field.name in self.model_description_excluded_fields():
+            if fields and field.name not in fields:
+                return False
+            if field.name in excluded_fields:
                 return False
             if not field.store:
                 return False
@@ -268,6 +329,7 @@ If there is no relevant information in the document return an empty dictionary.'
             return True
         model_fields = [self._fields[key] for key in self._fields if is_valid_field(self._fields[key])]
         return model_fields
+
     def _get_json_model_fields_description(self):
         model_fields = self._get_model_fields()
         empty_dict = {field.name: '' for field in model_fields}
@@ -395,14 +457,16 @@ If there is no relevant information in the document return an empty dictionary.'
             _logger.info('Cleaned up values: %s', values)
             return self.env[self._name].create(values)
         except Exception as err:
-            _logger.error(err, exc_info=True)
+            _logger.error(err, exc_info=True, stack_info=True)
             raise err
 
-    def create_records_from_attachments(self, res_ids):
+    @api.model
+    def create_records_from_attachments(self, res_ids, default_values=None):
         res = []
+        context = {'lang': self.env.user.lang}
         for res_id in res_ids:
             try:
-                record_id = self._create_record_from_attachment(res_id)
+                record_id = self.with_context(context)._create_record_from_attachment(res_id, default_values)
                 if record_id:
                     res.append(record_id.id)
             except Exception as err:

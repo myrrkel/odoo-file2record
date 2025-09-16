@@ -1,26 +1,20 @@
  [![License: LGPL-3](https://img.shields.io/badge/licence-LGPL--3-blue.png)](http://www.gnu.org/licenses/lgpl-3.0-standalone.html)
 
-File2Record Image
+File2Record Expense
 ===================
 
 <img src="./static/description/icon.png" alt="File2Record Logo" style="width:100px;"/>
 
-This module allows to upload an image to any model to create a new record with OCR.
-Supported image formats : JPEG, PNG, HEIC
+This module allows to upload a file to create a new expense.
 
 ## Usage
 
-Upload an image from a list view.
+Upload a file from the expense list view.
 
 
 ## Requirements
 
 [File2Record](../file2record/README.md) is required. 
-
-This module requires the Python library PyTesseract and Google’s Tesseract-OCR Engine.
-
-    sudo apt install tesseract-ocr
-    pip install pytesseract
 
 ## Maintainer
 

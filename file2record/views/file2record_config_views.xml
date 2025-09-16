@@ -24,6 +24,8 @@
 
                     <group name="bottom">
                         <group>
+                            <field name="fields" widget="many2many_tags"
+                            domain="[('model_id', '=', model_id)]"/>
                             <field name="excluded_fields" widget="many2many_tags"/>
                             <field name="post_process"/>
                             <field name="model_post_process_method"

@@ -75,4 +75,6 @@ class ResPartner(models.Model):
     def cleanup_record_values(self, values):
         if 'active' in values:
             values.pop('active')
+        if values.get('company_name', '') and not values.get('name', ''):
+            values['name'] = values['company_name']
         return super(ResPartner, self).cleanup_record_values(values)
