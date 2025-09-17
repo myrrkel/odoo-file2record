@@ -7,11 +7,11 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='data_type']" position="after">
                 <field name="tesseract_parameters"
-                       attrs="{'invisible': [('data_type', '!=', 'image')]}"/>
+                       invisible="data_type != 'image'"/>
                 <field name="preprocess_with_osd"
-                       attrs="{'invisible': [('data_type', '!=', 'image')]}"/>
+                       invisible="data_type != 'image'"/>
                 <field name="get_lang_from_ai"
-                       attrs="{'invisible': [('data_type', '!=', 'image')]}"/>
+                       invisible="data_type != 'image'"/>
             </xpath>
         </field>
     </record>

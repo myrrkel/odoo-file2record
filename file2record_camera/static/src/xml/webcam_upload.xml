@@ -12,6 +12,7 @@
     <t t-name="file2record_camera.WebcamImageField" owl="1">
         <button type="button" class="btn btn-secondary d-none btn-camera2record"
                 data-tooltip="Take a picture to create a new record"
+                style="margin-left: 4px;"
                 t-on-click="_openWebcam">
             <i class="fa fa-camera"/>
         </button>

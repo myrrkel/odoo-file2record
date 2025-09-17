@@ -2,7 +2,7 @@
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/algpl.html).
 {
     'name': 'File2Record Expense',
-    'version': '16.1.0.0',
+    'version': '18.0.0.0.1',
     'author': 'Michel Perrocheau',
     'website': 'https://github.com/myrrkel',
     'summary': "Allows to upload file to create expense",

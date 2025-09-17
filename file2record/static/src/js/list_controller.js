@@ -6,7 +6,7 @@ import {ListController} from "@web/views/list/list_controller";
 import {KanbanController} from "@web/views/kanban/kanban_controller";
 import {FileUploader} from "@web/views/fields/file_handler";
 import {standardWidgetProps} from "@web/views/widgets/standard_widget_props";
-import {Component, onWillStart, onWillRender, onMounted} from "@odoo/owl";
+import {Component, onWillStart} from "@odoo/owl";
 import { patch } from "@web/core/utils/patch";
 import { user } from "@web/core/user";
 
@@ -95,7 +95,7 @@ RecordFileUploader.fieldDependencies = {
     type: { type: "selection" },
 };
 
-registry.category("views").add("record_file_uploader", RecordFileUploader);
+registry.category("field").add("record_file_uploader", RecordFileUploader);
 
 async function _isFile2RecordButtonVisible(self) {
     if (!await user.hasGroup("file2record.group_file_upload_user")) {

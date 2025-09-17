@@ -5,7 +5,6 @@ import { FileUploader } from "@web/views/fields/file_handler";
 import { useService } from "@web/core/utils/hooks";
 import { registry } from "@web/core/registry";
 import { Dialog } from "@web/core/dialog/dialog";
-import { standardWidgetProps } from "@web/views/widgets/standard_widget_props";
 const { Component, useRef, useState, onMounted , onWillUnmount} = owl;
 
 class WebcamUpload extends Component {
@@ -38,7 +37,6 @@ class WebcamUpload extends Component {
     async takePicture() {
         canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
         let image_data_url = canvas.toDataURL('image/jpeg', 1.0);
-        dataurl.value = image_data_url;
 
         const attData = {
             name: 'camera.jpg',
@@ -104,8 +102,10 @@ export class WebcamImageField extends Component {
     }
 
     showCamera2RecordButton() {
-        let camera2RecordButton = $(document.getElementsByClassName('btn-camera2record'));
-        camera2RecordButton.removeClass('d-none');
+        const buttons = document.getElementsByClassName('btn-camera2record');
+        for (const button of buttons) {
+            button.classList.remove('d-none');
+        }
     }
 
     async isCamera2RecordButtonVisible() {
