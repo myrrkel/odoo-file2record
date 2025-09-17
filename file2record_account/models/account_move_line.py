@@ -13,9 +13,9 @@ class AccountMoveLine(models.Model):
     @api.model
     def _get_json_model_one2many_field_description(self):
         product_template_id = self.env['product.template']._get_json_model_many2one_field_description()
-        return {'name': '', 'quantity': 0, 'price_unit': 0, 'tax_rate': 0,
-                'product_template_id': product_template_id,
-                }
+        res = {'name': '', 'quantity': 0, 'price_unit': 0, 'tax_rate': 0}
+        if product_template_id:
+            res['product_template_id'] = product_template_id
     @api.model
     def _create_one2many_record(self, values_list):
         for values in values_list:
@@ -23,7 +23,9 @@ class AccountMoveLine(models.Model):
                 if not values['product_template_id'].get('name'):
                     values['product_template_id']['name'] = values['name']
             if values.get('product_template_id'):
-                values['product_template_id'] = self.env['product.template']._find_or_create_many2one_record(values.get('product_template_id'))
+                rec_id = values['product_template_id']
+                product_template_id = self.env['product.template']._find_or_create_many2one_record(rec_id)
+                values['product_template_id'] = product_template_id
         res = super(AccountMoveLine, self)._create_one2many_record(values_list)
         for values in res:
             product_template_id = values['product_template_id']

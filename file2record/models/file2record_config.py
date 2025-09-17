@@ -48,11 +48,6 @@ class UploadFileConfig(models.Model):
     fields = fields.Many2many('ir.model.fields', 'file2record_config_fields_rel', 'config_id', 'field_id',
                               string='Fields')
 
-    @api.model
-    def is_file_to_record_button_visible(self, model):
-        if self.search([('model', '=', model), ('show_upload_file_button', '=', True)]):
-            return True
-
     def eval_record_creation_code(self, content):
         res = False
         local_dict = {'self': self, 'res': res, 'content': content}

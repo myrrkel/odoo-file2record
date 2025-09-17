@@ -95,10 +95,8 @@ RecordFileUploader.fieldDependencies = {
     type: { type: "selection" },
 };
 
-registry.category("field").add("record_file_uploader", RecordFileUploader);
-
 async function _isFile2RecordButtonVisible(self) {
-    if (!await user.hasGroup("file2record.group_file_upload_user")) {
+    if (!await user.hasGroup("file2record.group_file_upload_user") || !self.props.resModel) {
         return false;
     }
     try {

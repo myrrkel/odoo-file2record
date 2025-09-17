@@ -17,8 +17,10 @@ register_heif_opener()
 class BaseModel(models.AbstractModel):
     _inherit = 'base'
 
-    def get_text_from_image(self, content):
+    def get_text_from_image(self, content, attachment_id=None):
         config_id = self.get_file2record_config('image')
+        if attachment_id and  config_id.ocr_completion_id and not config_id.tesseract_parameters:
+            return config_id.ocr_completion_id.create_completion(attachment_id.id, self._ocr_prompt())
         params = config_id.get_tesseract_params() if config_id else {'config': '--psm 6'}
         img = Image.open(io.BytesIO(content))
 
@@ -78,9 +80,12 @@ class BaseModel(models.AbstractModel):
         _logger.info('Image OSD : %s', image_osd)
         return image_osd
 
+    def _ocr_prompt(self):
+        return 'Return the text of the document.'
+
     def _get_values_from_attachment(self, attachment_id, content):
         if self._is_attachment_image(attachment_id):
-            text = self.get_text_from_image(content)
+            text = self.get_text_from_image(content, attachment_id)
             _logger.info('OCR Result : %s', text)
             res = self._get_record_values(attachment_id.name, 'image', text.strip())
             if len(res.keys()) <= 1 or res.get('file_processing_error', False):
@@ -93,7 +98,7 @@ class BaseModel(models.AbstractModel):
                     if hasattr(config_id, 'retry_ocr_completion_id') and config_id.retry_ocr_completion_id:
                         _logger.info('OCR Retry #2')
                         text = config_id.retry_ocr_completion_id.create_completion(attachment_id.id,
-                                                                                   prompt='get text with OCR')
+                                                                                   prompt=self._ocr_prompt())
                         _logger.info('OCR Retry #2 Result : %s', text)
                         res = self._get_record_values(attachment_id.name, 'image', text.strip())
             return res

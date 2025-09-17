@@ -307,7 +307,8 @@ If there is no relevant information in the document return an empty dictionary.'
         return res
 
     def _get_model_fields(self):
-        field_types = ['html', 'text', 'char', 'boolean', 'integer', 'float', 'many2one', 'one2many', 'monetary']
+        field_types = ['html', 'text', 'char', 'boolean', 'integer', 'date', 'datetime',
+                       'float', 'many2one', 'one2many', 'monetary']
         excluded_fields = self.model_description_excluded_fields()
         fields = self.model_description_fields()
 
@@ -350,10 +351,13 @@ If there is no relevant information in the document return an empty dictionary.'
                 empty_dict[field.name] = 0
             elif field.type in ['boolean']:
                 empty_dict[field.name] = False
+            elif field.type in ['date', 'datetime']:
+                empty_dict[field.name] = '2000-01-01'
+            elif field.type in ['datetime']:
+                empty_dict[field.name] = '2000-01-01 00:00:00'
             else:
                 empty_dict[field.name] = ''
         description = json.dumps(empty_dict, indent=2)
-        _logger.info(description)
         return description
 
     def _get_field_description(self, field):

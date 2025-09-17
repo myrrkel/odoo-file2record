@@ -85,8 +85,6 @@ class WebcamUpload extends Component {
 WebcamUpload.template = "file2record_camera.WebcamUpload";
 WebcamUpload.components = { Dialog, FileUploader };
 
-registry.category("fields").add("webcam_upload", WebcamUpload);
-
 export class WebcamImageField extends Component {
 
     setup() {
@@ -143,6 +141,3 @@ KanbanController.components = {
     WebcamImageField,
     Dialog,
 };
-
-
-registry.category("fields").add("webcam_image_field", WebcamImageField);
