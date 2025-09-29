@@ -33,7 +33,6 @@ class TextUpload extends Component {
 TextUpload.template = "file2record_text.TextUpload";
 TextUpload.components = { Dialog, FileUploader };
 
-registry.category("fields").add("text_upload", TextUpload);
 
 export class TextFieldController extends Component {
 
@@ -89,6 +88,3 @@ KanbanController.components = {
     TextFieldController,
     Dialog,
 };
-
-
-registry.category("fields").add("upload_text_field", TextFieldController);

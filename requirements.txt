@@ -1,4 +1,4 @@
 PyMuPDF==1.26.4
 mammoth==1.9.0
-#pytesseract
-#pillow-heif
+pytesseract
+pillow-heif

@@ -37,11 +37,11 @@ class BaseModel(models.AbstractModel):
                     _logger.error(err, exc_info=True)
         if res and isinstance(res, list) and len(res) >= 1:
             if isinstance(res[0], str):
-                return json.loads(res[0])
+                return json.loads(res[0], strict=False)
             else:
-                return json.loads(res[0].answer)
+                return json.loads(res[0].answer, strict=False)
         elif res and isinstance(res, str):
-            return json.loads(res)
+            return json.loads(res, strict=False)
 
     def _get_values_from_attachment_id(self, attachment_id):
         context = {'model': 'ir.attachment', 'res_id': attachment_id}

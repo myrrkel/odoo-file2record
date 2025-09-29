@@ -14,7 +14,7 @@ class AICompletionResult(models.Model):
     def get_answer_with_record_values(self):
         if not self.model == 'ir.attachment':
             raise UserError(_("Model %s is not supported") % self.model)
-        values = json.loads(self.answer)
+        values = json.loads(self.answer, strict=False)
         attachment_id = self.resource_ref
         rec = self.env[attachment_id.res_model].browse(attachment_id.res_id)
         if not rec:
