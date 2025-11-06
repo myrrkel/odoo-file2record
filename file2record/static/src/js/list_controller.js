@@ -30,6 +30,7 @@ export class RecordFileUploader extends Component {
         const attData = {
             name: file.name,
             mimetype: file.type,
+            type: 'binary',
             datas: file.data,
             res_model: this.env.searchModel.resModel,
         };

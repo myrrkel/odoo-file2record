@@ -41,6 +41,7 @@ class WebcamUpload extends Component {
         const attData = {
             name: 'camera.jpg',
             mimetype: 'image/jpeg',
+            type: 'binary',
             datas: image_data_url.split(",")[1],
             res_model: this.props.resModel,
         };
