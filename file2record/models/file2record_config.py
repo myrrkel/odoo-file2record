@@ -57,5 +57,9 @@ class UploadFileConfig(models.Model):
     def eval_post_process_code(self, values):
         res = False
         local_dict = {'self': self, 'res': res, 'values': values}
-        safe_eval(self.post_process_code, SAFE_EVAL_BASE, local_dict, mode='exec', nocopy=True)
+        try:
+            safe_eval(self.post_process_code, SAFE_EVAL_BASE, local_dict, mode='exec', nocopy=True)
+        except Exception as e:
+            _logger.exception("Exception occurred : %s" % e, exc_info=True)
+            pass
         return local_dict['res']
