@@ -49,8 +49,10 @@ export class TextFieldController extends Component {
     }
 
     showText2RecordButton() {
-        let text2RecordButton = $(document.getElementsByClassName('btn-text2record'));
-        text2RecordButton.removeClass('d-none');
+        let buttons = document.getElementsByClassName('btn-text2record');
+        for (const button of buttons) {
+            button.classList.remove('d-none');
+        }
     }
 
     async isText2RecordButtonVisible() {

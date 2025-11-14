@@ -19,7 +19,7 @@
         <Dialog title="'Create a record from text'" size="'lg'">
 
             <div class="text-center">
-                <textarea id="text"></textarea>
+                <textarea id="text" style="width: 100%; height: 250px;"></textarea>
             </div>
             <t t-set-slot="footer">
                 <button class="btn btn-primary" id="click-photo" t-on-click="sendText">Create a record</button>
