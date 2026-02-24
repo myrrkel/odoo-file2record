@@ -80,8 +80,13 @@ class BaseModel(models.AbstractModel):
 
     def _get_values_from_attachment(self, attachment_id, content):
         if self._is_attachment_image(attachment_id):
-            text = self.get_text_from_image(content)
-            _logger.info('OCR Result : %s', text)
+            config_id = self.get_file2record_config('image')
+            if config_id and config_id.ocr_completion_id:
+                text = config_id.ocr_completion_id.create_completion(attachment_id.id,
+                                                                      prompt='get text with OCR')
+            else:
+                text = self.get_text_from_image(content)
+                _logger.info('OCR Result : %s', text)
             res = self._get_record_values(attachment_id.name, 'image', text.strip())
             if len(res.keys()) <= 1 or res.get('file_processing_error', False):
                 text = self.get_retry_ocr_text(Image.open(io.BytesIO(content)), params={'config': '--psm 6'})
