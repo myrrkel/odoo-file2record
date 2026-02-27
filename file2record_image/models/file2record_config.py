@@ -3,7 +3,6 @@
 
 from odoo import models, fields, api, _
 import logging
-import ast
 
 _logger = logging.getLogger(__name__)
 
@@ -17,9 +16,3 @@ class UploadFileConfig(models.Model):
         return res
 
     data_type = fields.Selection(selection=_get_data_type_list)
-    tesseract_parameters = fields.Char()
-    preprocess_with_osd = fields.Boolean()
-    get_lang_from_ai = fields.Boolean("Get Language From AI")
-
-    def get_tesseract_params(self):
-        return ast.literal_eval(self.tesseract_parameters) if self.tesseract_parameters else {}

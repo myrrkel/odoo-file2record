@@ -1,19 +1,20 @@
 # Copyright (C) 2024 - Michel Perrocheau (https://github.com/myrrkel).
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/algpl.html).
 {
-    'name': 'File2Record Image',
+    'name': 'File2Record Image Tesseract',
     'version': '19.0.1.0.0',
     'author': 'Michel Perrocheau',
     'website': 'https://github.com/myrrkel',
-    'summary': "Allows to upload Image for any model",
+    'summary': "Add Tesseract OCR support for image processing",
     'sequence': 0,
     'certificate': '',
     'license': 'LGPL-3',
     'depends': [
-        'file2record',
+        'file2record_image',
     ],
     'external_dependencies': {
-        'python': ['pillow-heif'],
+        'python': ['pytesseract'],
+        'bin': ['tesseract'],
     },
     'category': 'EDI',
     'complexity': 'easy',
@@ -24,8 +25,6 @@
     'images': [
     ],
     'data': [
-        'security/ir.model.access.csv',
-        'security/security.xml',
         'views/file2record_config_views.xml',
     ],
     'assets': {

@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<odoo>
+    <record id="file2record_config_view_form_inherit_tesseract" model="ir.ui.view">
+        <field name="name">file2record.config.view.form.inherit.tesseract</field>
+        <field name="model">file2record.config</field>
+        <field name="inherit_id" ref="file2record_image.file2record_config_view_form_inherit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='data_type']" position="after">
+                <field name="tesseract_parameters"
+                       invisible="data_type != 'image'"/>
+                <field name="preprocess_with_osd"
+                       invisible="data_type != 'image'"/>
+                <field name="get_lang_from_ai"
+                       invisible="data_type != 'image'"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
