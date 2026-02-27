@@ -2,7 +2,7 @@
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
 from odoo import models, _, api
-from odoo.osv import expression
+from odoo.fields import Domain
 import logging
 _logger = logging.getLogger(__name__)
 

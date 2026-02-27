@@ -2,13 +2,14 @@
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
 from odoo import models, _, api
-from odoo.osv import expression
+from odoo.fields import Domain as expression
 import logging
+
 _logger = logging.getLogger(__name__)
 
 
 class AccountMove(models.Model):
-    _inherit = 'account.move'
+    _inherit = "account.move"
 
     def _create_record_from_attachment(self, res_id, default_values=None):
         res = super(AccountMove, self)._create_record_from_attachment(res_id)
@@ -16,6 +17,6 @@ class AccountMove(models.Model):
         return res
 
     def cleanup_record_values(self, values):
-        if 'move_type' not in values:
-            values['move_type'] = 'in_invoice'
+        if "move_type" not in values:
+            values["move_type"] = "in_invoice"
         return super(AccountMove, self).cleanup_record_values(values)

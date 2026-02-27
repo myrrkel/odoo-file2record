@@ -213,7 +213,7 @@ class BaseModel(models.AbstractModel):
     def _get_html_from_pdf(self, content, drop_last_page=False):
         doc = fitz.open("pdf", content)
         html_content = ''
-        for i, page in enumerate(doc):
+        for i, page in enumerate(doc.pages()):
             if drop_last_page and i == len(doc) - 1:
                 continue
             page.read_contents()
@@ -496,7 +496,7 @@ If there is no relevant information in the document return an empty dictionary.'
             'domain': [('id', 'in', res)],
             'res_model': self._name,
             'type': 'ir.actions.act_window',
-            'context': self._context
+            'context': self.env.context
         }
         if len(res) == 1:
             action_vals.update({

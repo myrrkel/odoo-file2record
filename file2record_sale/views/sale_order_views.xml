@@ -4,7 +4,7 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form" />
         <field name="arch" type="xml">
-            <xpath expr="//div[hasclass('oe_chatter')]" position="after">
+            <xpath expr="//chatter" position="before">
                 <div class="o_attachment_preview"/>
             </xpath>
         </field>

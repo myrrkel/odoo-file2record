@@ -144,18 +144,44 @@ class BaseModel(models.AbstractModel):
         if html2plaintext(res):
             return res
 
-        doc = fitz.open("pdf", content)
+        try:
+            # Validate that content is not empty and is bytes
+            if not content or not isinstance(content, bytes):
+                _logger.error("Invalid PDF content: content must be non-empty bytes")
+                return ''
+            
+            # Try to open the PDF document
+            doc = fitz.open("pdf", content)
+            
+            # Check if the document is valid
+            if doc.page_count <= 0:
+                _logger.error("Invalid PDF document: no pages found")
+                doc.close()
+                return ''
+                
+        except Exception as e:
+            _logger.error(f"Failed to open PDF document: {e}", exc_info=True)
+            return ''
+            
         pdf_img_list = []
         img_txt_list = []
-        for i, page in enumerate(doc):
-            page.read_contents()
-            img_list = page.get_images()
-            for img in img_list:
-                try:
-                    pdf_img_list.append(doc.extract_image(img[0]))
-                except Exception as err:
-                    _logger.warning(err, exc_info=True)
-                    pass
+        try:
+            for i, page in enumerate(doc):
+                page.read_contents()
+                img_list = page.get_images()
+                for img in img_list:
+                    try:
+                        pdf_img_list.append(doc.extract_image(img[0]))
+                    except Exception as err:
+                        _logger.warning(err, exc_info=True)
+                        pass
+        except Exception as e:
+            _logger.error(f"Error processing PDF pages: {e}", exc_info=True)
+            doc.close()
+            return ''
+        finally:
+            doc.close()
+            
         if not pdf_img_list:
             return ''
         for pdf_img in pdf_img_list:
