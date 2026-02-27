@@ -236,7 +236,7 @@ class BaseModel(models.AbstractModel):
                 if field.name in EXCLUDED_REQUIRED_FIELDS[self._name]:
                     return False
             exclude_args = ['default', 'compute', 'company_dependent']
-            if field.required and field.args and not any(arg in exclude_args for arg in field.args.keys()):
+            if field.required and not any(getattr(field, arg) for arg in exclude_args):
                 return True
 
         required_fields = [f for f in self._fields if field_is_required(self._fields[f])]
