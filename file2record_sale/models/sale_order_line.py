@@ -1,7 +1,7 @@
 # Copyright (C) 2024 - Michel Perrocheau (https://github.com/myrrkel).
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
-from odoo import models, _, api
+from odoo import Command, models, _, api
 from odoo.fields import Domain as expression
 import logging
 _logger = logging.getLogger(__name__)
@@ -45,7 +45,7 @@ class SaleOrderLine(models.Model):
                     ('type_tax_use', '=', 'sale'),
                 ], limit=1)
                 if tax:
-                    values['tax_id'] = tax.ids
+                    values['tax_ids'] = [Command.set(tax.ids)]
 
         return res
 
